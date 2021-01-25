@@ -1,36 +1,35 @@
-// use fastrand::bool;
+use std::rc::Rc;
+use fastrand::bool;
 
-fn main() {
-    let node1 = build_node(20, vec![1, 2, 3], 3);
-    let key_node_pair1 = build_key_node_pair(1, node1);
-    println!("key node pair 1 is {:?}", key_node_pair1);
+fn main() {}
+
+fn add<T>(val: T, slist: SkipList<T>) -> SkipList<T> {
+    if slist.len() == 0 { // adding to an empty list
+        let mut new_node = Node<T> {
+            val,
+            Vec::new()
+        }
+        while fastrand::bool() { // the height is determined by a coin flip
+            new_node.next.push(None); // the next node of val is none
+            // the sentinel (of height the same as val) points to val
+            slist.push(Some(new_node))
+        }
+    } else {
+        //TODO
+        Vec::new()
+    }
 }
 
-fn build_node(val: i32, next: ListOfPointers, height: usize) -> Node {
-    Node { val, next, height }
-}
+// a vector of successive nodes, at a given level i.
+// the successive node could be none.
+type VecOfNodes<T> = Vec<Rc<Option<Node<T>>>>;
 
-fn build_key_node_pair(key: KeyType, node: Node) -> KeyNodePair {
-    (key, node)
-}
-
-type ValueType = i32; // the type of the value of the list.
-
-type KeyType = usize; // the type of the key of the list.
-
-// the list is a list of key/value pair.
-type KeyNodePair = (KeyType, Node);
-
-// a list of pointers, pointing to the node's successor at a given level i
-type ListOfPointers = Vec<usize>;
-
-// a skip list is a sentinel and a list of key/node pair
-type SkipList = (ListOfPointers, Vec<KeyNodePair>);
+// a skip list is a vec of nodes.
+type SkipList<T> = VecOfNodes<T>;
 
 #[derive(Debug)]
-// A node containing an element and a list of pointers.
-struct Node {
-    val: ValueType, // the element/value
-    next: ListOfPointers,
-    height: usize, // the current height
+// A node contains a value of type T and a vec of nodes.
+struct Node<T> {
+    val: T,              // the element/value
+    next: VecOfNodes<T>, // a list of next nodes
 }
