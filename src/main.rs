@@ -1,23 +1,49 @@
+use fastrand::bool; // for coin flipping
+use std::cmp::Ordering; // TODO ordering of val required.
 use std::rc::Rc;
-use fastrand::bool;
 
 fn main() {}
 
-fn add<T>(val: T, slist: SkipList<T>) -> SkipList<T> {
-    if slist.len() == 0 { // adding to an empty list
-        let mut new_node = Node<T> {
+fn add<T>(val: T, mut slist: SkipList<T>) -> SkipList<T> {
+    if true {
+    //TODO find_node<T>(val, slist) == None { // if val doesn't exist, add it
+        // initialize new node with val
+        let mut new_node = Node {
             val,
-            Vec::new()
-        }
+            next: Vec::new(),
+        };
+        // figure out the correct next of val to add the new node
+        let next_node = find_next<T>(val, slist);
         while fastrand::bool() { // the height is determined by a coin flip
-            new_node.next.push(None); // the next node of val is none
-            // the sentinel (of height the same as val) points to val
-            slist.push(Some(new_node))
-        }
-    } else {
-        //TODO
-        Vec::new()
-    }
+            // points to the next node of val
+            while next_node.next.len() >= new_node.next.len() {
+                new_node.next.push(Rc::new(next_node));
+            };
+            // TODO the extra height has to point to the node after
+        };
+        // TODO update the pointers of the previous node to point to new node
+        // TODO if pred_node is nil, need to update the whole sentinel to point
+        // at new val
+        // update the added height of the sentinel
+        let counter = 0;
+        while slist.len() < new_node.next.len() - counter {
+            // if val is higher then the sentinel, the height of the sentinel
+            // increases to the same as the height of val, 
+            // and the increased pointers point to val.
+            slist.push(Rc::new(Some(new_node)));
+            counter+=1;
+        };
+        slist
+    } else { // if val exists, update val to new val
+    slist //TODO    
+    } 
+}
+
+// TODO
+fn find_node<T>(val: T, slist: SkipList<T>) -> Option<SkipList<T>> {
+    // let last_index = slist.len();
+    // if val > slist
+    None
 }
 
 // a vector of successive nodes, at a given level i.
