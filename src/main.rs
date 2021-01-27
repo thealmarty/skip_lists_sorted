@@ -1,6 +1,7 @@
 use fastrand::bool; // for coin flipping
 use std::cmp::Ordering; // TODO ordering of val required.
-use std::rc::Rc;
+use std::rc::Rc; // TODO change to atomic to allow for concurrency
+use std::borrow::Borrow;
 
 fn main() {}
 
@@ -14,7 +15,7 @@ fn add<T>(val: T, mut slist: SkipList<T>) -> SkipList<T> {
         };
         // figure out the correct next of val to add the new node
         let next_node = find_next<T>(val, slist);
-        while fastrand::bool() { // the height is determined by a coin flip
+        while fastrand::bool() { // the height is determined by coin flips
             // points to the next node of val
             while next_node.next.len() >= new_node.next.len() {
                 new_node.next.push(Rc::new(next_node));
@@ -22,10 +23,13 @@ fn add<T>(val: T, mut slist: SkipList<T>) -> SkipList<T> {
             // TODO the extra height has to point to the node after
         };
         // TODO update the pointers of the previous node to point to new node
-        // TODO if pred_node is nil, need to update the whole sentinel to point
+        // if next_node was the first node, need to update the whole sentinel to point
         // at new val
+        if next_node.val == slist(0) {
+
+        }
         // update the added height of the sentinel
-        let counter = 0;
+        let mut counter = 0;
         while slist.len() < new_node.next.len() - counter {
             // if val is higher then the sentinel, the height of the sentinel
             // increases to the same as the height of val, 
@@ -39,11 +43,35 @@ fn add<T>(val: T, mut slist: SkipList<T>) -> SkipList<T> {
     } 
 }
 
-// TODO
-fn find_node<T>(val: T, slist: SkipList<T>) -> Option<SkipList<T>> {
-    // let last_index = slist.len();
-    // if val > slist
-    None
+// finds if val is in the slist. If not, it returns none. Otherwise, it returns
+// the node that has val equals to the input val.
+fn find_node<T>(val: T, slist: SkipList<T>) -> Option<Node<T>> {
+    if slist.len() == 0 {
+        None
+    } else {
+        let mut counter = 0;
+        let height = slist.len() - 1; // height of sentinel
+        let cur_height = height - counter; // current height
+        let next_val = slist[cur_height].borrow().val; // the val to be compared
+        let move_down = 
+                while val < slist[cur_height].borrow().val {
+                    counter+=1;
+                };
+        let move_right = 
+            match slist[cur_height].borrow().next[cur_height] {
+                None => move_down, // 
+                Some node => while val > node.val > 0 {
+                    counter+=1;
+                    let node = node.next[cur_height];
+            };
+        while cur_height > 0 { // TODO finish all cases
+            if val > next_val {
+                move_right;
+            } else {
+                slist[cur_height].borrow().next[cur_height]
+            }
+        }
+    };
 }
 
 // a vector of successive nodes, at a given level i.
@@ -58,4 +86,4 @@ type SkipList<T> = VecOfNodes<T>;
 struct Node<T> {
     val: T,              // the element/value
     next: VecOfNodes<T>, // a list of next nodes
-}
+};
